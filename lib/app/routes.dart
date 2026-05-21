@@ -13,7 +13,8 @@ class UnlockTransitionPage extends CustomTransitionPage<void> {
           key: const ValueKey('home'),
           transitionDuration: AppDurations.long,
           reverseTransitionDuration: AppDurations.medium,
-          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          transitionsBuilder:
+              (context, animation, secondaryAnimation, child) {
             return SlideTransition(
               position: Tween<Offset>(
                 begin: const Offset(0, 0.3),
@@ -23,17 +24,19 @@ class UnlockTransitionPage extends CustomTransitionPage<void> {
                 curve: Curves.easeOutCubic,
               )),
               child: FadeTransition(
-                opacity: Tween<double>(begin: 0.0, end: 1.0)
-                    .animate(CurvedAnimation(
-                      parent: animation,
-                      curve: const Interval(0.3, 1.0),
-                    )),
+                opacity: Tween<double>(begin: 0.0, end: 1.0).animate(
+                  CurvedAnimation(
+                    parent: animation,
+                    curve: const Interval(0.3, 1.0),
+                  ),
+                ),
                 child: Transform.scale(
-                  scale: Tween<double>(begin: 0.9, end: 1.0)
-                      .animate(CurvedAnimation(
-                        parent: animation,
-                        curve: Curves.easeOutBack,
-                      )),
+                  scale: Tween<double>(begin: 0.9, end: 1.0).animate(
+                    CurvedAnimation(
+                      parent: animation,
+                      curve: Curves.easeOutBack,
+                    ),
+                  ),
                   child: child,
                 ),
               ),
@@ -49,7 +52,8 @@ class LockTransitionPage extends CustomTransitionPage<void> {
           key: const ValueKey('lock'),
           transitionDuration: AppDurations.medium,
           reverseTransitionDuration: AppDurations.long,
-          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          transitionsBuilder:
+              (context, animation, secondaryAnimation, child) {
             return SlideTransition(
               position: Tween<Offset>(
                 begin: const Offset(0, -1),
@@ -59,11 +63,7 @@ class LockTransitionPage extends CustomTransitionPage<void> {
                 curve: Curves.easeOutCubic,
               )),
               child: FadeTransition(
-                opacity: Tween<double>(begin: 0.0, end: 1.0)
-                    .animate(CurvedAnimation(
-                      parent: animation,
-                      curve: Curves.easeIn,
-                    )),
+                opacity: animation,
                 child: child,
               ),
             );
@@ -71,13 +71,14 @@ class LockTransitionPage extends CustomTransitionPage<void> {
         );
 }
 
-/// مخصص صفحة التخصيص (تنزلق من الأسفل).
+/// مخصص صفحة التخصيص.
 class CustomizationTransitionPage extends CustomTransitionPage<void> {
   CustomizationTransitionPage({required super.child})
       : super(
           key: const ValueKey('customization'),
           transitionDuration: AppDurations.medium,
-          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          transitionsBuilder:
+              (context, animation, secondaryAnimation, child) {
             return SlideTransition(
               position: Tween<Offset>(
                 begin: const Offset(0, 0.5),
@@ -101,20 +102,20 @@ class AppRouter {
     routes: [
       GoRoute(
         path: '/',
-        pageBuilder: (context, state) => const LockTransitionPage(
-          child: LockScreenPage(),
+        pageBuilder: (context, state) => LockTransitionPage(
+          child: const LockScreenPage(),
         ),
       ),
       GoRoute(
         path: '/home',
-        pageBuilder: (context, state) => const UnlockTransitionPage(
-          child: HomePage(),
+        pageBuilder: (context, state) => UnlockTransitionPage(
+          child: const HomePage(),
         ),
       ),
       GoRoute(
         path: '/customization',
-        pageBuilder: (context, state) => const CustomizationTransitionPage(
-          child: CustomizationPage(), // يعرض كصفحة كاملة (بدون bottom sheet)
+        pageBuilder: (context, state) => CustomizationTransitionPage(
+          child: const CustomizationPage(),
         ),
       ),
     ],
