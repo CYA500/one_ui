@@ -27,10 +27,25 @@ jobs:
           flutter-version: '3.22.x'
           channel: 'stable'
 
-      - name: Remove old Android embedding references
+      - name: Regenerate Android folder (v2 embedding)
         run: |
-          flutter clean
-          rm -rf android/.gradle
+          mkdir -p _custom_android/app
+          cp -r android/app/src _custom_android/app/ || true
+          cp android/app/build.gradle _custom_android/app/ || true
+          cp android/build.gradle _custom_android/ || true
+          cp android/settings.gradle _custom_android/ || true
+          cp android/gradle.properties _custom_android/ || true
+
+          rm -rf android
+          flutter create --platforms=android --org com.oneui85.simulator .
+
+          cp -r _custom_android/app/src android/app/
+          cp _custom_android/app/build.gradle android/app/
+          cp _custom_android/build.gradle android/
+          cp _custom_android/settings.gradle android/
+          cp _custom_android/gradle.properties android/
+
+          rm -rf _custom_android
 
       - name: Install dependencies
         run: flutter pub get
