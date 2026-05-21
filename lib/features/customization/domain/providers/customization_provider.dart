@@ -1,6 +1,14 @@
 // lib/features/customization/domain/providers/customization_provider.dart
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../lockscreen/domain/models/clock_style.dart';
+
+/// أنماط الساعة الأربعة.
+enum ClockStyle {
+  digitalThin,
+  digitalBold,
+  analog,
+  retroFlip,
+}
 
 /// حالة التخصيص الكاملة.
 class CustomizationState {
