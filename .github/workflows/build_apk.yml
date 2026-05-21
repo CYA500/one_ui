@@ -27,6 +27,231 @@ jobs:
           flutter-version: '3.22.x'
           channel: 'stable'
 
+      - name: Regenerate Android project (clean v2 embedding)
+        run: |
+          # حذف android القديم بالكامل
+          rm -rf android
+
+          # إنشاء مشروع android جديد تمامًا (v2 embedding)
+          flutter create --platforms=android --org com.oneui85.simulator .
+
+          # الآن سننسخ ملفاتنا المخصصة فوقه
+          # تأكد من أن جميع الملفات المخصصة موجودة في مستودعك تحت المسار: android_custom/
+          # وإلا سنكتبها هنا مباشرة (أفضل)
+
+          # كتابة AndroidManifest
+          cat > android/app/src/main/AndroidManifest.xml << 'EOFMANIFEST'
+          <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+              package="com.oneui85.simulator">
+
+              <uses-permission android:name="android.permission.INTERNET"/>
+              <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+              <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+              <uses-permission android:name="android.permission.CAMERA"/>
+              <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"
+                  android:maxSdkVersion="32"/>
+              <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+                  android:maxSdkVersion="32"/>
+
+              <application
+                  android:label="One UI 8.5 Simulator"
+                  android:icon="@mipmap/ic_launcher"
+                  android:allowBackup="true"
+                  android:theme="@style/Theme.OneUI85"
+                  android:supportsRtl="true">
+
+                  <activity
+                      android:name=".MainActivity"
+                      android:exported="true"
+                      android:theme="@style/Theme.OneUI85.Splash"
+                      android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
+                      android:hardwareAccelerated="true"
+                      android:windowSoftInputMode="adjustResize">
+                      <intent-filter>
+                          <action android:name="android.intent.action.MAIN"/>
+                          <category android:name="android.intent.category.LAUNCHER"/>
+                      </intent-filter>
+                  </activity>
+
+                  <provider
+                      android:name="androidx.core.content.FileProvider"
+                      android:authorities="${applicationId}.fileprovider"
+                      android:exported="false"
+                      android:grantUriPermissions="true">
+                      <meta-data
+                          android:name="android.support.FILE_PROVIDER_PATHS"
+                          android:resource="@xml/file_paths"/>
+                  </provider>
+              </application>
+          </manifest>
+          EOFMANIFEST
+
+          # كتابة build.gradle للتطبيق
+          cat > android/app/build.gradle << 'EOFAPPBUILD'
+          plugins {
+              id "com.android.application"
+              id "kotlin-android"
+              id "dev.flutter.flutter-gradle-plugin"
+          }
+
+          android {
+              namespace "com.oneui85.simulator"
+              compileSdk 35
+
+              ndkVersion flutter.ndkVersion
+
+              compileOptions {
+                  sourceCompatibility JavaVersion.VERSION_17
+                  targetCompatibility JavaVersion.VERSION_17
+              }
+
+              kotlinOptions {
+                  jvmTarget = '17'
+              }
+
+              defaultConfig {
+                  applicationId "com.oneui85.simulator"
+                  minSdk 31
+                  targetSdk 35
+                  versionCode 1
+                  versionName "1.0.0"
+              }
+
+              signingConfigs {
+                  release {
+                      storeFile file('keystore.jks')
+                      storePassword project.findProperty('storePassword') ?: ''
+                      keyAlias project.findProperty('keyAlias') ?: ''
+                      keyPassword project.findProperty('keyPassword') ?: ''
+                  }
+              }
+
+              buildTypes {
+                  release {
+                      signingConfig signingConfigs.release
+                      minifyEnabled true
+                      proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+                  }
+              }
+          }
+
+          dependencies {
+              implementation "androidx.core:core-splashscreen:1.0.1"
+          }
+
+          flutter {
+              source '../..'
+          }
+          EOFAPPBUILD
+
+          # كتابة styles.xml
+          mkdir -p android/app/src/main/res/values
+          cat > android/app/src/main/res/values/styles.xml << 'EOFSTYLES'
+          <?xml version="1.0" encoding="utf-8"?>
+          <resources>
+              <style name="Theme.OneUI85" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+                  <item name="android:statusBarColor">@android:color/transparent</item>
+                  <item name="android:navigationBarColor">@android:color/transparent</item>
+              </style>
+              <style name="Theme.OneUI85.Splash" parent="Theme.SplashScreen">
+                  <item name="windowSplashScreenBackground">@color/splash_background</item>
+                  <item name="postSplashScreenTheme">@style/Theme.OneUI85</item>
+              </style>
+          </resources>
+          EOFSTYLES
+
+          # كتابة colors.xml
+          cat > android/app/src/main/res/values/colors.xml << 'EOFCOLORS'
+          <?xml version="1.0" encoding="utf-8"?>
+          <resources>
+              <color name="splash_background">#FF1A1A2E</color>
+          </resources>
+          EOFCOLORS
+
+          # كتابة file_paths.xml
+          mkdir -p android/app/src/main/res/xml
+          cat > android/app/src/main/res/xml/file_paths.xml << 'EOFFILEPATHS'
+          <?xml version="1.0" encoding="utf-8"?>
+          <paths>
+              <external-path name="external_files" path="."/>
+              <cache-path name="cache" path="."/>
+          </paths>
+          EOFFILEPATHS
+
+          # كتابة MainActivity.kt (تأكد من المسار الصحيح)
+          MAINACTIVITY_PATH="android/app/src/main/kotlin/com/oneui85/simulator"
+          mkdir -p "$MAINACTIVITY_PATH"
+          cat > "$MAINACTIVITY_PATH/MainActivity.kt" << 'EOFMAINACTIVITY'
+          package com.oneui85.simulator
+
+          import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+          import io.flutter.embedding.android.FlutterActivity
+
+          class MainActivity : FlutterActivity() {
+              override fun onCreate(savedInstanceState: Bundle?) {
+                  installSplashScreen()
+                  super.onCreate(savedInstanceState)
+              }
+          }
+          EOFMAINACTIVITY
+
+          # كتابة build.gradle (المشروع)
+          cat > android/build.gradle << 'EOFROOTBUILD'
+          buildscript {
+              ext.kotlin_version = '1.9.22'
+              repositories {
+                  google()
+                  mavenCentral()
+              }
+              dependencies {
+                  classpath "com.android.tools.build:gradle:8.2.1"
+              }
+          }
+
+          allprojects {
+              repositories {
+                  google()
+                  mavenCentral()
+              }
+          }
+          EOFROOTBUILD
+
+          # كتابة settings.gradle
+          cat > android/settings.gradle << 'EOFSETTINGS'
+          pluginManagement {
+              def flutterSdkPath = {
+                  def properties = new Properties()
+                  file("local.properties").withInputStream { properties.load(it) }
+                  def flutterSdkPath = properties.getProperty("flutter.sdk")
+                  assert flutterSdkPath != null, "flutter.sdk not set in local.properties"
+                  return flutterSdkPath
+              }()
+
+              includeBuild("$flutterSdkPath/packages/flutter_tools/gradle")
+
+              repositories {
+                  google()
+                  mavenCentral()
+                  gradlePluginPortal()
+              }
+          }
+
+          plugins {
+              id "dev.flutter.flutter-plugin-loader" version "1.0.0"
+              id "com.android.application" version "8.2.1" apply false
+              id "org.jetbrains.kotlin.android" version "1.9.22" apply false
+          }
+
+          include ":app"
+          EOFSETTINGS
+
+          # كتابة gradle.properties
+          cat > android/gradle.properties << 'EOFGRADLEPROPS'
+          org.gradle.jvmargs=-Xmx4G
+          android.useAndroidX=true
+          android.enableJetifier=true
+          EOFGRADLEPROPS
+
       - name: Install dependencies
         run: flutter pub get
 
@@ -39,7 +264,7 @@ jobs:
           echo "storeFile=keystore.jks" >> android/key.properties
 
       - name: Build APK
-        run: flutter build apk --debug
+        run: flutter build apk --release
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
