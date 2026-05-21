@@ -23,22 +23,11 @@ class AppOpenTransition extends PageRouteBuilder {
               CurvedAnimation(parent: animation, curve: Curves.easeIn),
             );
 
-            // انزياح من موقع الأيقونة إلى المركز (اختياري)
-            final offset = Tween<Offset>(
-              begin: center / MediaQuery.of(context).size,
-              end: Offset.zero,
-            ).animate(
-              CurvedAnimation(parent: animation, curve: Curves.easeOut),
-            );
-
             return Transform.scale(
               scale: scale.value,
               child: Opacity(
                 opacity: opacity.value,
-                child: FractionalTranslation(
-                  translation: offset.value,
-                  child: child,
-                ),
+                child: child,
               ),
             );
           },
