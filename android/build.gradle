@@ -11,10 +11,19 @@ subprojects {
 }
 
 subprojects { subproject ->
+    subproject.ext.flutter = [
+        compileSdkVersion: 34,
+        minSdkVersion: 21,
+        targetSdkVersion: 34,
+        ndkVersion: "27.0.12077973",
+    ]
+}
+
+subprojects { subproject ->
     subproject.afterEvaluate {
         if (subproject.plugins.hasPlugin("com.android.library")) {
             subproject.android {
-                compileSdk = 35
+                compileSdk = 34
                 if (subproject.android.defaultConfig.minSdk == null) {
                     subproject.android.defaultConfig.minSdk = 21
                 }

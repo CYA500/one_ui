@@ -12,7 +12,7 @@ if (keystorePropertiesFile.exists()) {
 
 android {
     namespace = "com.oneui85.simulator"
-    compileSdk = 35
+    compileSdk 34
     ndkVersion = "27.0.12077973"
 
     compileOptions {
@@ -26,8 +26,8 @@ android {
 
     defaultConfig {
         applicationId = "com.oneui85.simulator"
-        minSdk = 31
-        targetSdk = 35
+        minSdk 31
+        targetSdk 34
         versionCode = flutter.versionCode
         versionName = flutter.versionName
     }

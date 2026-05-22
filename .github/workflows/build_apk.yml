@@ -30,7 +30,7 @@ jobs:
           channel: stable
           flutter-version: "3.24.5"
 
-      - name: Generate local.properties
+      - name: Create local.properties
         run: |
           echo "flutter.sdk=${FLUTTER_ROOT}" > android/local.properties
           echo "sdk.dir=${ANDROID_HOME}" >> android/local.properties
