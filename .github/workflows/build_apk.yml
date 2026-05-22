@@ -36,9 +36,13 @@ jobs:
 
       - name: Create local.properties
         run: |
-          echo "flutter.sdk=$FLUTTER_ROOT" > android/local.properties
-          echo "sdk.dir=$ANDROID_HOME" >> android/local.properties
-
+          echo "sdk.dir=${ANDROID_HOME}" > android/local.properties
+          echo "flutter.sdk=${FLUTTER_ROOT}" >> android/local.properties
+          if ! grep -q "^flutter.sdk=." android/local.properties; then
+            echo "flutter.sdk is empty — cannot build"
+            exit 1
+          fi
+          
       - name: Install dependencies
         run: flutter pub get
 
