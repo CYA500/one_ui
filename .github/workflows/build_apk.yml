@@ -39,7 +39,7 @@ jobs:
           echo "flutter.sdk=${{ steps.flutter.outputs.flutter-root }}" > android/local.properties
           echo "sdk.dir=${ANDROID_HOME}" >> android/local.properties
           cat android/local.properties
-          
+
       - name: Install dependencies
         run: flutter pub get
 
@@ -64,13 +64,13 @@ jobs:
 
       - name: Refresh local.properties before build
         run: |
-          echo "flutter.sdk=${FLUTTER_ROOT}" > android/local.properties
+          echo "flutter.sdk=${{ steps.flutter.outputs.flutter-root }}" > android/local.properties
           echo "sdk.dir=${ANDROID_HOME}" >> android/local.properties
           if ! grep -q "^flutter.sdk=." android/local.properties; then
             echo "flutter.sdk is empty — cannot build"
-          exit 1
-            fi
-          cat android/local.properties 
+            exit 1
+          fi
+          cat android/local.properties
 
       - name: Build release APK
         env:
@@ -84,4 +84,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: oneui85-release.apk
-          path: build/app/outputs/flutter-apk/app-release.apk 
+          path: build/app/outputs/flutter-apk/app-release.apk
