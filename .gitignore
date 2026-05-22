@@ -6,6 +6,9 @@
 build/
 pubspec.lock
 
+# Android
+android/local.properties
+
 # Android signing
 android/key.properties
 **/*.jks
