@@ -70,6 +70,7 @@ jobs:
             echo "flutter.sdk is empty — cannot build"
             exit 1
           fi
+          cat android/local.properties
 
       - name: Build release App Bundle
         env:
