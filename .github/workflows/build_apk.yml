@@ -26,14 +26,19 @@ jobs:
 
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
+        id: flutter
         with:
           channel: stable
           flutter-version: "3.24.5"
 
+      - name: Precache Android
+        run: flutter precache --android
+
       - name: Create local.properties
         run: |
-          echo "flutter.sdk=${FLUTTER_ROOT}" > android/local.properties
+          echo "flutter.sdk=${{ steps.flutter.outputs.flutter-root }}" > android/local.properties
           echo "sdk.dir=${ANDROID_HOME}" >> android/local.properties
+          cat android/local.properties
 
       - name: Install dependencies
         run: flutter pub get
@@ -56,6 +61,15 @@ jobs:
           keyAlias=${{ env.KEY_ALIAS }}
           storeFile=${{ env.KEYSTORE_FILE }}
           EOF
+
+      - name: Refresh local.properties before build
+        run: |
+          echo "flutter.sdk=${{ steps.flutter.outputs.flutter-root }}" > android/local.properties
+          echo "sdk.dir=${ANDROID_HOME}" >> android/local.properties
+          if ! grep -q "^flutter.sdk=." android/local.properties; then
+            echo "flutter.sdk is empty — cannot build"
+            exit 1
+          fi
 
       - name: Build release APK
         env:
